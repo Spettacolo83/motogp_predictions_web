@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Rider, Team } from "@/db/schema";
 
 interface PodiumEntry {
@@ -9,19 +10,28 @@ interface PodiumEntry {
 
 interface Props {
   title: string;
+  avatarUrl?: string | null;
   podium: [PodiumEntry, PodiumEntry, PodiumEntry];
   showPoints?: boolean;
   totalPoints?: number;
 }
 
-export function PredictionCard({ title, podium, showPoints, totalPoints }: Props) {
+export function PredictionCard({ title, avatarUrl, podium, showPoints, totalPoints }: Props) {
   const medals = ["bg-yellow-400 text-black", "bg-gray-300 text-black", "bg-amber-700 text-white"];
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center justify-between">
-          {title}
+          <div className="flex items-center gap-2">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={avatarUrl || undefined} />
+              <AvatarFallback className="text-base">
+                {title.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {title}
+          </div>
           {showPoints && totalPoints !== undefined && (
             <Badge variant="secondary">{totalPoints} pts</Badge>
           )}

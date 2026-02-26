@@ -239,6 +239,7 @@ export default async function RaceDetailPage({
                     <PredictionCard
                       key={pred.id}
                       title={user?.nickname || user?.name || "User"}
+                      avatarUrl={user?.image}
                       podium={podiumWithPoints}
                       showPoints={!!result}
                       totalPoints={score?.points}
@@ -250,6 +251,7 @@ export default async function RaceDetailPage({
               {result && userPrediction && (
                 <PredictionCard
                   title={`${t("yourPrediction")}`}
+                  avatarUrl={session?.user?.image}
                   podium={(() => {
                     const calc = calculateScore(
                       { pos1: userPrediction.position1RiderId, pos2: userPrediction.position2RiderId, pos3: userPrediction.position3RiderId },

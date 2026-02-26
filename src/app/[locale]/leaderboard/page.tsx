@@ -37,6 +37,7 @@ export default async function LeaderboardPage({
   const standings: StandingEntry[] = standingsRaw.map((s) => ({
     userId: s.userId,
     nickname: userMap.get(s.userId)?.nickname || userMap.get(s.userId)?.name || "User",
+    image: userMap.get(s.userId)?.image,
     totalPoints: s.totalPoints,
     racesPlayed: s.racesPlayed,
   }));
@@ -75,10 +76,14 @@ export default async function LeaderboardPage({
     chartData.push(entry);
   }
 
-  const players = playerNames.map((name, i) => ({
-    name,
-    color: COLORS[i % COLORS.length],
-  }));
+  const players = playerNames.map((name, i) => {
+    const standing = standings.find((s) => s.nickname === name);
+    return {
+      name,
+      color: COLORS[i % COLORS.length],
+      image: standing?.image,
+    };
+  });
 
   return (
     <div className="space-y-6">

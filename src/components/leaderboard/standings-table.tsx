@@ -10,10 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface StandingEntry {
   userId: string;
   nickname: string;
+  image?: string | null;
   totalPoints: number;
   racesPlayed: number;
 }
@@ -38,13 +40,23 @@ export function StandingsTable({ standings }: { standings: StandingEntry[] }) {
       </TableHeader>
       <TableBody>
         {sorted.map((entry, i) => (
-          <TableRow key={entry.userId}>
+          <TableRow key={entry.userId} className="h-14">
             <TableCell className="font-bold">
               <span className={i < 3 ? `${medals[i]} text-lg` : ""}>
                 {i + 1}
               </span>
             </TableCell>
-            <TableCell className="font-medium">{entry.nickname}</TableCell>
+            <TableCell>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={entry.image || undefined} />
+                  <AvatarFallback className="text-xs">
+                    {entry.nickname.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="font-medium">{entry.nickname}</span>
+              </div>
+            </TableCell>
             <TableCell className="text-center">{entry.racesPlayed}</TableCell>
             <TableCell className="text-center">
               {entry.racesPlayed > 0
