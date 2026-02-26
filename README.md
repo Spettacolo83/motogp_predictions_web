@@ -193,7 +193,30 @@ See `.env.example` for all required variables.
 
 ## Screenshots
 
-> Screenshots will be added after production deployment.
+### Homepage
+Dashboard with next race info, user stats, and quick navigation.
+
+![Homepage](public/screenshots/01-homepage.png)
+
+### Season Calendar
+Full 2026 season calendar with race status, track layouts, and country flags.
+
+![Calendar](public/screenshots/02-calendar.png)
+
+### Race Prediction
+Podium prediction form with rider selection for 1st, 2nd, and 3rd place.
+
+![Race Prediction](public/screenshots/03-race-prediction.png)
+
+### Leaderboard - Standings
+Player rankings with total points, races played, and average score.
+
+![Leaderboard Table](public/screenshots/04-leaderboard-table.png)
+
+### Leaderboard - Points History
+Cumulative points chart tracking each player's progression across races.
+
+![Points History](public/screenshots/05-leaderboard-chart.png)
 
 ## Key Implementation Details
 

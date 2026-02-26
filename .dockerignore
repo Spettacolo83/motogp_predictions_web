@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.claude
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+public/uploads
