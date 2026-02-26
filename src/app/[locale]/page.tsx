@@ -156,7 +156,7 @@ export default async function HomePage({
         )}
         <Card>
           <CardContent className="flex items-center justify-center py-8">
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4">
               <Link href={`/${locale}/calendar`}>
                 <Button variant="outline" className="gap-2">
                   <Calendar className="h-4 w-4" />
