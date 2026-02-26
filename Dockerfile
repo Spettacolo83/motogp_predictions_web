@@ -36,12 +36,20 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy drizzle migrations for runtime
 COPY --from=builder /app/drizzle ./drizzle
 
+# Copy node_modules for drizzle-kit and tsx (needed for seed)
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
 # Create data directory for SQLite (persistent volume)
 RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
 # Copy seed script and schema for initial setup
 COPY --from=builder /app/src/db ./src/db
 COPY --from=builder /app/drizzle.config.ts ./
+
+# Copy entrypoint script
+COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 USER nextjs
 
@@ -50,4 +58,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["./docker-entrypoint.sh"]
