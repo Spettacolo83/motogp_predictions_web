@@ -33,7 +33,7 @@ export function WildcardForm({ teams, wildcards }: Props) {
     startTransition(async () => {
       const result = await addWildcardRider(fd);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("wildcardAdded"));
         (e.target as HTMLFormElement).reset();
@@ -44,7 +44,7 @@ export function WildcardForm({ teams, wildcards }: Props) {
   const handleDelete = (riderId: string) => {
     startTransition(async () => {
       await deleteRider(riderId);
-      toast.success("Deleted");
+      toast.success(t("riderDeleted"));
     });
   };
 

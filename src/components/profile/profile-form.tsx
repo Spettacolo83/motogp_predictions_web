@@ -40,7 +40,7 @@ export function ProfileForm({ user }: Props) {
     startTransition(async () => {
       const result = await updateNickname(user.id, nickname);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("nicknameSaved"));
         router.refresh();
@@ -69,10 +69,10 @@ export function ProfileForm({ user }: Props) {
         toast.success(t("imageSaved"));
         router.refresh();
       } else {
-        toast.error(data.error || "Upload failed");
+        toast.error(t("uploadFailed"));
       }
     } catch {
-      toast.error("Upload failed");
+      toast.error(t("uploadFailed"));
     } finally {
       setUploading(false);
     }

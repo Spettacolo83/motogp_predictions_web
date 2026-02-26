@@ -50,7 +50,18 @@
     "completeProfile": "Complete Your Profile",
     "completeProfileDescription": "Choose a nickname to get started",
     "welcomeBack": "Welcome back!",
-    "notRegistered": "This Google account is not registered yet. Enter your invitation code below and try again."
+    "notRegistered": "This Google account is not registered yet. Enter your invitation code below and try again.",
+    "verifyEmailTitle": "Verify Your Email",
+    "verifyEmailDescription": "We sent a verification link to your email. Check your inbox and click the link to activate your account.",
+    "resendVerificationEmail": "Resend Verification Email",
+    "verificationEmailSent": "Verification email sent!",
+    "resendRateLimited": "Please wait a few minutes before requesting another email",
+    "resendFailed": "Failed to send email. Try again later.",
+    "sending": "Sending...",
+    "useAnotherAccount": "Use another account",
+    "emailVerifiedSuccess": "Email verified successfully!",
+    "invalidToken": "Invalid or expired verification link",
+    "tokenExpired": "Verification link has expired. Please request a new one."
   },
   "home": {
     "title": "MotoGP Predictions 2026",
@@ -200,7 +211,22 @@
     "cannotChangeSelfRole": "You cannot change your own role",
     "nicknameExists": "This nickname is already taken",
     "usersLabel": "Users",
-    "noUsers": "No users registered yet"
+    "noUsers": "No users registered yet",
+    "verified": "Verified",
+    "pendingVerification": "Pending",
+    "emailVerification": "Email Verification",
+    "verifyManually": "Verify Manually",
+    "resendVerification": "Resend Email",
+    "userVerified": "User verified!",
+    "verificationEmailSent": "Verification email sent!",
+    "unauthorized": "Unauthorized action",
+    "invalidData": "Invalid data provided",
+    "sameRider": "Cannot select the same rider twice",
+    "notFound": "Not found",
+    "userNotFound": "User not found",
+    "alreadyVerified": "User is already verified",
+    "emailFailed": "Failed to send email",
+    "uploadFailed": "Upload failed"
   },
   "profile": {
     "title": "Your Profile",
@@ -223,7 +249,11 @@
     "memberSince": "Member Since",
     "googleAccount": "Google",
     "emailAccount": "Email & Password",
-    "dangerZone": "Danger Zone"
+    "dangerZone": "Danger Zone",
+    "nicknameExists": "This nickname is already taken",
+    "invalidNickname": "Nickname must be between 2 and 20 characters",
+    "unauthorized": "Unauthorized action",
+    "uploadFailed": "Upload failed"
   },
   "riders": {
     "title": "2026 Riders & Teams",

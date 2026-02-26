@@ -9,6 +9,8 @@ declare module "next-auth" {
       image?: string | null;
       role: string;
       nickname?: string | null;
+      isEmailVerified: boolean;
+      isCredentials: boolean;
     };
   }
 
@@ -23,5 +25,7 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: string;
     nickname?: string | null;
+    isEmailVerified?: boolean;
+    isCredentials?: boolean;
   }
 }

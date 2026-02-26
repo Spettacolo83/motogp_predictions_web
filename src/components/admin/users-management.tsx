@@ -21,9 +21,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { adminUpdateUser, adminDeleteUser } from "@/actions/admin";
+import { adminUpdateUser, adminDeleteUser, adminVerifyUser, adminResendVerification } from "@/actions/admin";
 import { toast } from "sonner";
-import { Pencil, Trash2, Shield, Mail, ClipboardList } from "lucide-react";
+import { Pencil, Trash2, Shield, Mail, ClipboardList, CheckCircle, Clock } from "lucide-react";
 import type { User } from "@/db/schema";
 
 type UserWithMeta = User & {
@@ -117,12 +117,25 @@ function UserRow({
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">You</Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground truncate flex items-center gap-2">
+        <p className="text-xs text-muted-foreground truncate flex items-center gap-2 flex-wrap">
           <span>{user.email}</span>
           <span>&middot;</span>
           <span className="capitalize">{user.provider === "credentials" ? "Email" : "Google"}</span>
           <span>&middot;</span>
           <span>{user.predictionsCount} {t("predictionsCount")}</span>
+          {user.provider === "credentials" && (
+            user.emailVerified ? (
+              <Badge className="bg-green-600 text-[10px] px-1.5 py-0">
+                <CheckCircle className="h-2.5 w-2.5 mr-0.5" />
+                {t("verified")}
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-[10px] px-1.5 py-0">
+                <Clock className="h-2.5 w-2.5 mr-0.5" />
+                {t("pendingVerification")}
+              </Badge>
+            )
+          )}
         </p>
       </div>
 
@@ -184,6 +197,47 @@ function UserRow({
                   <p className="text-xs text-muted-foreground">{t("cannotChangeSelfRole")}</p>
                 )}
               </div>
+
+              {user.provider === "credentials" && !user.emailVerified && (
+                <div className="space-y-2 border-t pt-4">
+                  <Label>{t("emailVerification")}</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        startTransition(async () => {
+                          const result = await adminVerifyUser(user.id);
+                          if (result.error) toast.error(t(result.error as string));
+                          else {
+                            toast.success(t("userVerified"));
+                            setEditOpen(false);
+                          }
+                        });
+                      }}
+                      disabled={isPending}
+                    >
+                      <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                      {t("verifyManually")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        startTransition(async () => {
+                          const result = await adminResendVerification(user.id);
+                          if (result.error) toast.error(t(result.error as string));
+                          else toast.success(t("verificationEmailSent"));
+                        });
+                      }}
+                      disabled={isPending}
+                    >
+                      <Mail className="h-3.5 w-3.5 mr-1" />
+                      {t("resendVerification")}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               <div className="text-xs text-muted-foreground">
                 {t("memberSince")}: {user.createdAt

@@ -33,7 +33,7 @@ export function DeleteAccountDialog({ userId }: { userId: string }) {
     startTransition(async () => {
       const result = await deleteUser(userId);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("accountDeleted"));
         await signOut({ callbackUrl: `/${locale}` });

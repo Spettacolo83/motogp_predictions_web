@@ -116,9 +116,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
+      }
+
+      // Track credentials vs OAuth (only set on first login)
+      if (account) {
+        token.isCredentials = account.provider === "credentials";
       }
 
       // Fetch latest user data
@@ -140,6 +145,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           token.nickname = dbUser.nickname;
           token.picture = dbUser.image;
+
+          // Determine isCredentials from DB if not set (existing sessions)
+          if (token.isCredentials === undefined) {
+            token.isCredentials = !!dbUser.passwordHash;
+          }
+
+          // Email verification status
+          if (!token.isCredentials) {
+            // Google/OAuth users are always verified
+            token.isEmailVerified = true;
+          } else {
+            token.isEmailVerified = !!dbUser.emailVerified;
+          }
 
           // Auto-set nickname from name for Google users who don't have one
           if (!dbUser.nickname && dbUser.name) {
@@ -167,6 +185,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.role = token.role as string;
         session.user.nickname = token.nickname as string;
         session.user.image = (token.picture as string) || null;
+        session.user.isEmailVerified = (token.isEmailVerified as boolean) ?? true;
+        session.user.isCredentials = (token.isCredentials as boolean) ?? false;
       }
       return session;
     },

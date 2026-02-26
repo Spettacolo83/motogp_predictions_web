@@ -113,6 +113,8 @@ export default async function RaceDetailPage({
                 alt="Track layout"
                 className="w-full h-full object-contain"
                 style={{ filter: "brightness(0)", opacity: 0.3 }}
+                loading="lazy"
+                fetchPriority="low"
               />
             </div>
           )}

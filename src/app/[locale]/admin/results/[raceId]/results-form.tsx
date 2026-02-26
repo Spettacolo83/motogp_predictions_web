@@ -48,7 +48,7 @@ export function AdminResultsForm({ raceId, riders, existingResult }: Props) {
     startTransition(async () => {
       const result = await saveResults(fd);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("resultsConfirmed"));
       }
@@ -59,7 +59,7 @@ export function AdminResultsForm({ raceId, riders, existingResult }: Props) {
     startTransition(async () => {
       const result = await recalculateScores(raceId);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("recalculated"));
       }
@@ -71,7 +71,7 @@ export function AdminResultsForm({ raceId, riders, existingResult }: Props) {
     startTransition(async () => {
       const result = await deleteRaceResults(raceId);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("resultsDeleted"));
         setPos1("");

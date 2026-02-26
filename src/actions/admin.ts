@@ -1,11 +1,12 @@
 "use server";
 
 import { db } from "@/db";
-import { predictions, riders, races, scores, raceResults, users, accounts } from "@/db/schema";
+import { predictions, riders, races, scores, raceResults, users, accounts, verificationTokens } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { eq, and, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { calculateScore } from "@/lib/scoring";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function deletePrediction(predictionId: string) {
   const session = await auth();
@@ -306,5 +307,70 @@ export async function adminDeleteUser(userId: string) {
   await db.delete(users).where(eq(users.id, userId));
 
   revalidatePath("/");
+  return { success: true };
+}
+
+export async function adminVerifyUser(userId: string) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "admin") {
+    return { error: "unauthorized" };
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+  if (!user) return { error: "userNotFound" };
+
+  await db
+    .update(users)
+    .set({ emailVerified: new Date() })
+    .where(eq(users.id, userId));
+
+  // Clean up pending tokens
+  if (user.email) {
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.identifier, user.email));
+  }
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function adminResendVerification(userId: string) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "admin") {
+    return { error: "unauthorized" };
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+  if (!user?.email) return { error: "userNotFound" };
+  if (user.emailVerified) return { error: "alreadyVerified" };
+
+  // Delete old tokens
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.identifier, user.email));
+
+  // Generate new token
+  const token = crypto.randomUUID();
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await db.insert(verificationTokens).values({
+    identifier: user.email,
+    token,
+    expires,
+  });
+
+  const sent = await sendVerificationEmail({
+    email: user.email,
+    token,
+    locale: "en",
+  });
+
+  if (!sent) return { error: "emailFailed" };
+
   return { success: true };
 }

@@ -1,13 +1,14 @@
 "use server";
 
 import { db } from "@/db";
-import { users, invitationCodes } from "@/db/schema";
+import { users, invitationCodes, verificationTokens } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { signIn, auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { sendVerificationEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -77,6 +78,23 @@ export async function registerUser(formData: FormData) {
     .update(invitationCodes)
     .set({ currentUses: code.currentUses + 1 })
     .where(eq(invitationCodes.id, code.id));
+
+  // Generate verification token and send email
+  const token = crypto.randomUUID();
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  await db.delete(verificationTokens).where(eq(verificationTokens.identifier, email));
+
+  await db.insert(verificationTokens).values({
+    identifier: email,
+    token,
+    expires,
+  });
+
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
+
+  await sendVerificationEmail({ email, token, locale });
 
   return { success: true };
 }
@@ -208,5 +226,60 @@ export async function deleteUser(userId: string) {
   await db.delete(users).where(eq(users.id, userId));
 
   revalidatePath("/");
+  return { success: true };
+}
+
+export async function resendVerificationEmail() {
+  const session = await auth();
+  if (!session?.user?.email || !session.user.id) {
+    return { error: "unauthorized" };
+  }
+
+  if (session.user.isEmailVerified) {
+    return { error: "alreadyVerified" };
+  }
+
+  // Rate limiting: check if a token was created less than 2 minutes ago
+  const existingToken = await db.query.verificationTokens.findFirst({
+    where: eq(verificationTokens.identifier, session.user.email),
+  });
+
+  if (existingToken) {
+    const twoMinutesFromCreation = new Date(
+      existingToken.expires.getTime() - 24 * 60 * 60 * 1000 + 2 * 60 * 1000
+    );
+    if (new Date() < twoMinutesFromCreation) {
+      return { error: "rateLimited" };
+    }
+  }
+
+  // Delete old tokens
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.identifier, session.user.email));
+
+  // Generate new token
+  const token = crypto.randomUUID();
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await db.insert(verificationTokens).values({
+    identifier: session.user.email,
+    token,
+    expires,
+  });
+
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
+
+  const sent = await sendVerificationEmail({
+    email: session.user.email,
+    token,
+    locale,
+  });
+
+  if (!sent) {
+    return { error: "emailFailed" };
+  }
+
   return { success: true };
 }

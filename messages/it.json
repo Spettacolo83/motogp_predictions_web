@@ -50,7 +50,18 @@
     "completeProfile": "Completa il tuo Profilo",
     "completeProfileDescription": "Scegli un nickname per iniziare",
     "welcomeBack": "Bentornato!",
-    "notRegistered": "Questo account Google non e' ancora registrato. Inserisci il codice invito qui sotto e riprova."
+    "notRegistered": "Questo account Google non e' ancora registrato. Inserisci il codice invito qui sotto e riprova.",
+    "verifyEmailTitle": "Verifica la tua Email",
+    "verifyEmailDescription": "Abbiamo inviato un link di verifica alla tua email. Controlla la posta in arrivo e clicca il link per attivare il tuo account.",
+    "resendVerificationEmail": "Reinvia Email di Verifica",
+    "verificationEmailSent": "Email di verifica inviata!",
+    "resendRateLimited": "Attendi qualche minuto prima di richiedere un'altra email",
+    "resendFailed": "Invio email fallito. Riprova più tardi.",
+    "sending": "Invio in corso...",
+    "useAnotherAccount": "Usa un altro account",
+    "emailVerifiedSuccess": "Email verificata con successo!",
+    "invalidToken": "Link di verifica non valido o scaduto",
+    "tokenExpired": "Il link di verifica è scaduto. Richiedine uno nuovo."
   },
   "home": {
     "title": "MotoGP Predictions 2026",
@@ -200,7 +211,22 @@
     "cannotChangeSelfRole": "Non puoi cambiare il tuo ruolo",
     "nicknameExists": "Questo nickname e' gia' in uso",
     "usersLabel": "Utenti",
-    "noUsers": "Nessun utente registrato"
+    "noUsers": "Nessun utente registrato",
+    "verified": "Verificato",
+    "pendingVerification": "In attesa",
+    "emailVerification": "Verifica Email",
+    "verifyManually": "Verifica Manuale",
+    "resendVerification": "Reinvia Email",
+    "userVerified": "Utente verificato!",
+    "verificationEmailSent": "Email di verifica inviata!",
+    "unauthorized": "Azione non autorizzata",
+    "invalidData": "Dati non validi",
+    "sameRider": "Non puoi selezionare lo stesso pilota due volte",
+    "notFound": "Non trovato",
+    "userNotFound": "Utente non trovato",
+    "alreadyVerified": "L'utente è già verificato",
+    "emailFailed": "Invio email fallito",
+    "uploadFailed": "Caricamento fallito"
   },
   "profile": {
     "title": "Il Tuo Profilo",
@@ -223,7 +249,11 @@
     "memberSince": "Membro Dal",
     "googleAccount": "Google",
     "emailAccount": "Email e Password",
-    "dangerZone": "Zona Pericolo"
+    "dangerZone": "Zona Pericolo",
+    "nicknameExists": "Questo nickname è già in uso",
+    "invalidNickname": "Il nickname deve essere tra 2 e 20 caratteri",
+    "unauthorized": "Azione non autorizzata",
+    "uploadFailed": "Caricamento fallito"
   },
   "riders": {
     "title": "Piloti e Team 2026",

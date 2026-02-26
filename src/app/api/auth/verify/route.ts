@@ -1,0 +1,57 @@
+import { db } from "@/db";
+import { users, verificationTokens } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
+  const locale = searchParams.get("locale") || "en";
+
+  if (!token || !email) {
+    return NextResponse.redirect(
+      new URL(`/${locale}/auth/login?error=invalidToken`, request.url)
+    );
+  }
+
+  const verificationToken = await db.query.verificationTokens.findFirst({
+    where: and(
+      eq(verificationTokens.identifier, email),
+      eq(verificationTokens.token, token)
+    ),
+  });
+
+  if (!verificationToken) {
+    return NextResponse.redirect(
+      new URL(`/${locale}/auth/login?error=invalidToken`, request.url)
+    );
+  }
+
+  if (verificationToken.expires < new Date()) {
+    await db
+      .delete(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.identifier, email),
+          eq(verificationTokens.token, token)
+        )
+      );
+    return NextResponse.redirect(
+      new URL(`/${locale}/auth/login?error=tokenExpired`, request.url)
+    );
+  }
+
+  // Verify the user
+  await db
+    .update(users)
+    .set({ emailVerified: new Date() })
+    .where(eq(users.email, email));
+
+  // Delete all tokens for this email
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.identifier, email));
+
+  return NextResponse.redirect(new URL(`/${locale}?verified=true`, request.url));
+}

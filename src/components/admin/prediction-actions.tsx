@@ -58,7 +58,7 @@ export function PredictionActions({
     startTransition(async () => {
       const result = await deletePrediction(predictionId);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("predictionDeleted"));
         setDeleteOpen(false);
@@ -71,7 +71,7 @@ export function PredictionActions({
     startTransition(async () => {
       const result = await adminEditPrediction(predictionId, pos1, pos2, pos3);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("predictionUpdated"));
         setEditOpen(false);
@@ -83,7 +83,7 @@ export function PredictionActions({
     startTransition(async () => {
       const result = await unlockRaceForPredictions(raceId);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("raceUnlocked"));
       }

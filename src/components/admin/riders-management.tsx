@@ -66,7 +66,7 @@ function RiderRow({
         isActive,
       });
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("riderUpdated"));
         setEditOpen(false);
@@ -92,7 +92,7 @@ function RiderRow({
         toast.success(t("imageSaved"));
       });
     } else {
-      toast.error("Upload failed");
+      toast.error(t("uploadFailed"));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -274,7 +274,7 @@ export function RidersManagement({ teams, riders }: Props) {
     startTransition(async () => {
       const result = await addRider(fd);
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("riderAdded"));
         resetAddForm();

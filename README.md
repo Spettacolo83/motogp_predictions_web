@@ -66,7 +66,7 @@ Users predict the top 3 finishers for each MotoGP race, earn points based on acc
 | Technology | Purpose |
 |---|---|
 | [next-intl](https://next-intl.dev/) | i18n framework with routing |
-| Supported locales | English (`en`), Italian (`it`) |
+| Supported locales | English (`en`), Italian (`it`), Spanish (`es`) |
 
 ## Architecture
 
@@ -86,7 +86,9 @@ src/
 │   │   ├── profile/      # User profile management
 │   │   ├── race/[id]/    # Race detail & prediction form
 │   │   └── riders/       # Riders & teams gallery
-│   └── api/auth/         # Auth.js API routes
+│   └── api/
+│       ├── auth/          # Auth.js API routes + email verification endpoint
+│       └── files/         # Serve uploaded files from persistent storage
 ├── components/
 │   ├── admin/            # Admin-specific components
 │   ├── auth/             # Login/Register forms
@@ -104,6 +106,7 @@ src/
 ├── i18n/                 # next-intl configuration
 ├── lib/
 │   ├── auth.ts           # Auth.js configuration
+│   ├── email.ts          # Email service (nodemailer)
 │   ├── scoring.ts        # Scoring algorithm
 │   └── utils.ts          # Utility functions
 ├── middleware.ts          # Locale routing middleware
@@ -169,13 +172,36 @@ The app will be available at [http://localhost:3001](http://localhost:3001).
 
 See `.env.example` for all required variables.
 
-| Variable | Description |
-|---|---|
-| `AUTH_SECRET` | Auth.js secret key |
-| `AUTH_GOOGLE_ID` | Google OAuth Client ID |
-| `AUTH_GOOGLE_SECRET` | Google OAuth Client Secret |
-| `INVITATION_CODE` | Code required for registration |
-| `AUTH_TRUST_HOST` | Set to `true` for production |
+#### Authentication
+| Variable | Required | Description |
+|---|---|---|
+| `AUTH_SECRET` | Yes | Auth.js secret key. Generate with: `npx auth secret` |
+| `AUTH_GOOGLE_ID` | No | Google OAuth Client ID (for Google login) |
+| `AUTH_GOOGLE_SECRET` | No | Google OAuth Client Secret |
+| `AUTH_TRUST_HOST` | Prod | Set to `true` in production environments |
+| `AUTH_URL` | Prod | Full base URL of the app (e.g. `https://yourdomain.com`). Required for email verification links and OAuth callbacks |
+
+#### Database
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | No | Path to SQLite database file. Defaults to `./sqlite.db` |
+| `DATA_DIR` | Prod | Persistent data directory for Docker deployments (e.g. `/app/data`). Stores database and uploaded files |
+
+#### Email (SMTP)
+| Variable | Required | Description |
+|---|---|---|
+| `SMTP_HOST` | No | SMTP server hostname (e.g. `mail.example.com`) |
+| `SMTP_PORT` | No | SMTP port. Use `587` for STARTTLS, `465` for SSL |
+| `SMTP_USER` | No | SMTP authentication username |
+| `SMTP_PASS` | No | SMTP authentication password |
+| `EMAIL_FROM` | No | Sender email address (e.g. `noreply@example.com`) |
+
+> **Note:** If SMTP variables are not set, verification emails are logged to the server console instead of being sent. This is useful for local development.
+
+#### Registration
+| Variable | Required | Description |
+|---|---|---|
+| `INVITATION_CODE` | Yes | Code required for new user registration (private league) |
 
 ### Available Scripts
 
@@ -221,8 +247,9 @@ Cumulative points chart tracking each player's progression across races.
 ## Key Implementation Details
 
 ### Authentication Flow
-- **Google OAuth**: One-click login with automatic profile creation
-- **Credentials**: Email/password with bcrypt hashing
+- **Google OAuth**: One-click login with automatic profile creation (auto-verified)
+- **Credentials**: Email/password with bcrypt hashing + email verification
+- **Email Verification**: After registration, users must verify their email via a confirmation link before accessing the app. Admins can manually verify users or resend verification emails from the admin panel
 - **Invitation Code**: Required for new registrations (private league)
 - **Admin Role**: Automatically assigned to configured admin email
 

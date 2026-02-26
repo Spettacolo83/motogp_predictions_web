@@ -42,7 +42,7 @@ export function RaceManagementCard({ race, locale }: { race: Race; locale: strin
         newDate: status === "rescheduled" ? newDate : null,
       });
       if (result.error) {
-        toast.error(result.error);
+        toast.error(t(result.error as string));
       } else {
         toast.success(t("raceUpdated"));
       }
@@ -68,7 +68,7 @@ export function RaceManagementCard({ race, locale }: { race: Race; locale: strin
         toast.success(t("trackUpdated"));
       });
     } else {
-      toast.error(data.error || "Upload failed");
+      toast.error(t("uploadFailed"));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

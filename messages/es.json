@@ -50,7 +50,18 @@
     "completeProfile": "Completa tu Perfil",
     "completeProfileDescription": "Elige un apodo para comenzar",
     "welcomeBack": "Bienvenido de nuevo!",
-    "notRegistered": "Esta cuenta de Google aun no esta registrada. Introduce tu codigo de invitacion a continuacion e intentalo de nuevo."
+    "notRegistered": "Esta cuenta de Google aun no esta registrada. Introduce tu codigo de invitacion a continuacion e intentalo de nuevo.",
+    "verifyEmailTitle": "Verifica tu Email",
+    "verifyEmailDescription": "Hemos enviado un enlace de verificacion a tu email. Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.",
+    "resendVerificationEmail": "Reenviar Email de Verificacion",
+    "verificationEmailSent": "Email de verificacion enviado!",
+    "resendRateLimited": "Espera unos minutos antes de solicitar otro email",
+    "resendFailed": "Error al enviar el email. Intentalo mas tarde.",
+    "sending": "Enviando...",
+    "useAnotherAccount": "Usar otra cuenta",
+    "emailVerifiedSuccess": "Email verificado con exito!",
+    "invalidToken": "Enlace de verificacion no valido o expirado",
+    "tokenExpired": "El enlace de verificacion ha expirado. Solicita uno nuevo."
   },
   "home": {
     "title": "MotoGP Predictions 2026",
@@ -200,7 +211,22 @@
     "cannotChangeSelfRole": "No puedes cambiar tu propio rol",
     "nicknameExists": "Este apodo ya esta en uso",
     "usersLabel": "Usuarios",
-    "noUsers": "Ningun usuario registrado"
+    "noUsers": "Ningun usuario registrado",
+    "verified": "Verificado",
+    "pendingVerification": "Pendiente",
+    "emailVerification": "Verificacion de Email",
+    "verifyManually": "Verificar Manualmente",
+    "resendVerification": "Reenviar Email",
+    "userVerified": "Usuario verificado!",
+    "verificationEmailSent": "Email de verificacion enviado!",
+    "unauthorized": "Accion no autorizada",
+    "invalidData": "Datos no validos",
+    "sameRider": "No puedes seleccionar el mismo piloto dos veces",
+    "notFound": "No encontrado",
+    "userNotFound": "Usuario no encontrado",
+    "alreadyVerified": "El usuario ya esta verificado",
+    "emailFailed": "Error al enviar el email",
+    "uploadFailed": "Error al subir el archivo"
   },
   "profile": {
     "title": "Tu Perfil",
@@ -223,7 +249,11 @@
     "memberSince": "Miembro Desde",
     "googleAccount": "Google",
     "emailAccount": "Email y Contrasena",
-    "dangerZone": "Zona de Peligro"
+    "dangerZone": "Zona de Peligro",
+    "nicknameExists": "Este apodo ya esta en uso",
+    "invalidNickname": "El apodo debe tener entre 2 y 20 caracteres",
+    "unauthorized": "Accion no autorizada",
+    "uploadFailed": "Error al subir el archivo"
   },
   "riders": {
     "title": "Pilotos y Equipos 2026",
