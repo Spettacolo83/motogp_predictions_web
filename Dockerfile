@@ -40,8 +40,8 @@ COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# Create data directory for SQLite (persistent volume)
-RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+# Create data directory for SQLite and uploads (persistent volume)
+RUN mkdir -p /app/data/uploads && chown -R nextjs:nodejs /app/data
 
 # Copy seed script and schema for initial setup
 COPY --from=builder /app/src/db ./src/db
@@ -57,5 +57,6 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV DATA_DIR="/app/data"
 
 CMD ["./docker-entrypoint.sh"]

@@ -33,13 +33,16 @@ export async function POST(request: NextRequest) {
   const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
   const filename = `${session.user.id}-${Date.now()}.${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "avatars");
+  const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "public");
+  const uploadDir = path.join(dataDir, "uploads", "avatars");
   await mkdir(uploadDir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(uploadDir, filename), buffer);
 
-  const imageUrl = `/uploads/avatars/${filename}`;
+  const imageUrl = process.env.DATA_DIR
+    ? `/api/files/uploads/avatars/${filename}`
+    : `/uploads/avatars/${filename}`;
 
   await db
     .update(users)

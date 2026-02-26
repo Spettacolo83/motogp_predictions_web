@@ -37,12 +37,15 @@ export async function POST(request: NextRequest) {
   const safeName = filename.replace(/[^a-z0-9-]/gi, "").toLowerCase();
   const fullFilename = `${safeName}.${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", folder);
+  const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "public");
+  const uploadDir = path.join(dataDir, "uploads", folder);
   await mkdir(uploadDir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(uploadDir, fullFilename), buffer);
 
-  const url = `/${folder}/${fullFilename}`;
+  const url = process.env.DATA_DIR
+    ? `/api/files/uploads/${folder}/${fullFilename}`
+    : `/${folder}/${fullFilename}`;
   return NextResponse.json({ url });
 }
