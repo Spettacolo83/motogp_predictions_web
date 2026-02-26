@@ -8,7 +8,7 @@ import { signIn, auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, sendAdminNotification } from "@/lib/email";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -95,6 +95,12 @@ export async function registerUser(formData: FormData) {
   const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
 
   await sendVerificationEmail({ email, token, locale });
+
+  sendAdminNotification({
+    type: "new_registration",
+    userName: nickname,
+    details: `Email: ${email}`,
+  });
 
   return { success: true };
 }

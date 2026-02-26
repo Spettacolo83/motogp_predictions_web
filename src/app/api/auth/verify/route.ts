@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { users, verificationTokens } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { sendAdminNotification } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -43,6 +44,10 @@ export async function GET(request: NextRequest) {
   }
 
   // Verify the user
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  });
+
   await db
     .update(users)
     .set({ emailVerified: new Date() })
@@ -52,6 +57,12 @@ export async function GET(request: NextRequest) {
   await db
     .delete(verificationTokens)
     .where(eq(verificationTokens.identifier, email));
+
+  sendAdminNotification({
+    type: "email_verified",
+    userName: user?.nickname || user?.name || email,
+    details: `Email: ${email}`,
+  });
 
   return NextResponse.redirect(new URL(`/${locale}?verified=true`, request.url));
 }

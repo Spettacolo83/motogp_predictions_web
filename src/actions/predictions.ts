@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { sendAdminNotification } from "@/lib/email";
 
 const predictionSchema = z.object({
   raceId: z.string().min(1),
@@ -78,6 +79,22 @@ export async function savePrediction(formData: FormData) {
       position3RiderId,
     });
   }
+
+  // Send admin notification (non-blocking)
+  const ridersList = await db.query.riders.findMany({
+    where: eq(riders.season, 2026),
+  });
+  const riderMap = new Map(ridersList.map((r) => [r.id, r]));
+  const r1 = riderMap.get(position1RiderId);
+  const r2 = riderMap.get(position2RiderId);
+  const r3 = riderMap.get(position3RiderId);
+  const podiumStr = `1° ${r1?.firstName} ${r1?.lastName}, 2° ${r2?.firstName} ${r2?.lastName}, 3° ${r3?.firstName} ${r3?.lastName}`;
+
+  sendAdminNotification({
+    type: existing ? "updated_prediction" : "new_prediction",
+    userName: session.user.nickname || session.user.name || session.user.email || "User",
+    details: `Gara: ${race.name}<br/>Podio: ${podiumStr}`,
+  });
 
   revalidatePath(`/race/${raceId}`);
   return { success: true, isUpdate: !!existing };

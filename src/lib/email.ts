@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 
+const ADMIN_EMAIL = "stefano.russello@gmail.com";
+
 const smtpConfigured = !!(
   process.env.SMTP_HOST &&
   process.env.SMTP_PORT &&
@@ -94,5 +96,70 @@ export async function sendVerificationEmail({
   } catch (error) {
     console.error("Failed to send verification email:", error);
     return false;
+  }
+}
+
+type AdminNotificationType =
+  | "new_prediction"
+  | "updated_prediction"
+  | "new_registration"
+  | "email_verified";
+
+interface AdminNotificationParams {
+  type: AdminNotificationType;
+  userName: string;
+  details?: string;
+}
+
+export async function sendAdminNotification({
+  type,
+  userName,
+  details,
+}: AdminNotificationParams): Promise<void> {
+  const subjects: Record<AdminNotificationType, string> = {
+    new_prediction: `🏁 ${userName} ha inviato una previsione`,
+    updated_prediction: `✏️ ${userName} ha modificato una previsione`,
+    new_registration: `👤 Nuovo utente registrato: ${userName}`,
+    email_verified: `✅ ${userName} ha verificato la sua email`,
+  };
+
+  const bodies: Record<AdminNotificationType, string> = {
+    new_prediction: `<b>${userName}</b> ha inviato una nuova previsione.`,
+    updated_prediction: `<b>${userName}</b> ha modificato la sua previsione.`,
+    new_registration: `<b>${userName}</b> si è registrato su MotoGP Predictions.`,
+    email_verified: `<b>${userName}</b> ha confermato il suo indirizzo email ed è ora attivo.`,
+  };
+
+  const subject = subjects[type];
+  const body = bodies[type];
+
+  const html = `
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+      <h2 style="color: #dc2626; margin: 0 0 16px;">MotoGP Predictions 2026</h2>
+      <p style="font-size: 15px; color: #333;">${body}</p>
+      ${details ? `<p style="font-size: 13px; color: #666; margin-top: 12px;">${details}</p>` : ""}
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+      <p style="font-size: 11px; color: #999;">Admin notification - MotoGP Predictions</p>
+    </div>
+  `;
+
+  if (!transporter) {
+    console.log(`\n========== ADMIN NOTIFICATION ==========`);
+    console.log(`Type: ${type}`);
+    console.log(`User: ${userName}`);
+    if (details) console.log(`Details: ${details}`);
+    console.log("=========================================\n");
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || "noreply@motogp-predictions.com",
+      to: ADMIN_EMAIL,
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error("Failed to send admin notification:", error);
   }
 }
