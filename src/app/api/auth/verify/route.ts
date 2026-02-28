@@ -9,11 +9,10 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get("token");
   const email = searchParams.get("email");
   const locale = searchParams.get("locale") || "en";
+  const baseUrl = process.env.AUTH_URL || request.url;
 
   if (!token || !email) {
-    return NextResponse.redirect(
-      new URL(`/${locale}/auth/login?error=invalidToken`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}/auth/login?error=invalidToken`, baseUrl));
   }
 
   const verificationToken = await db.query.verificationTokens.findFirst({
@@ -24,9 +23,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!verificationToken) {
-    return NextResponse.redirect(
-      new URL(`/${locale}/auth/login?error=invalidToken`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}/auth/login?error=invalidToken`, baseUrl));
   }
 
   if (verificationToken.expires < new Date()) {
@@ -38,9 +35,7 @@ export async function GET(request: NextRequest) {
           eq(verificationTokens.token, token)
         )
       );
-    return NextResponse.redirect(
-      new URL(`/${locale}/auth/login?error=tokenExpired`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}/auth/login?error=tokenExpired`, baseUrl));
   }
 
   // Verify the user
@@ -64,5 +59,5 @@ export async function GET(request: NextRequest) {
     details: `Email: ${email}`,
   });
 
-  return NextResponse.redirect(new URL(`/${locale}?verified=true`, request.url));
+  return NextResponse.redirect(new URL(`/${locale}?verified=true`, baseUrl));
 }
