@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { savePrediction } from "@/actions/predictions";
+import { PodiumPreview } from "@/components/predictions/podium-preview";
 import { toast } from "sonner";
 import type { Rider, Team, Prediction } from "@/db/schema";
 
@@ -139,6 +140,8 @@ export function PredictionForm({ raceId, riders, existing, locked }: Props) {
             </SelectContent>
           </Select>
         </div>
+
+        <PodiumPreview riders={riders} pos1={pos1} pos2={pos2} pos3={pos3} />
 
         <Button
           onClick={handleSubmit}
