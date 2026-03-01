@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { adminUpdateUser, adminDeleteUser, adminVerifyUser, adminResendVerification } from "@/actions/admin";
+import { updateProfileImage } from "@/actions/auth";
 import { toast } from "sonner";
-import { Pencil, Trash2, Shield, Mail, ClipboardList, CheckCircle, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Pencil, Trash2, Shield, Mail, ClipboardList, CheckCircle, Clock, Camera, X } from "lucide-react";
 import type { User } from "@/db/schema";
 
 type UserWithMeta = User & {
@@ -48,10 +50,55 @@ function UserRow({
   startTransition: (fn: () => Promise<void>) => void;
 }) {
   const t = useTranslations("admin");
+  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [nickname, setNickname] = useState(user.nickname || "");
   const [role, setRole] = useState(user.role);
+  const [avatarUrl, setAvatarUrl] = useState(user.image);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const isSelf = user.id === currentUserId;
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(t("uploadFailed"));
+      return;
+    }
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("userId", user.id);
+    try {
+      const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setAvatarUrl(data.url);
+        toast.success(t("userUpdated"));
+        router.refresh();
+      } else {
+        toast.error(t("uploadFailed"));
+      }
+    } catch {
+      toast.error(t("uploadFailed"));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    startTransition(async () => {
+      const result = await updateProfileImage(user.id, null);
+      if (result.error) {
+        toast.error(t(result.error as string));
+      } else {
+        setAvatarUrl(null);
+        toast.success(t("avatarRemoved"));
+        router.refresh();
+      }
+    });
+  };
 
   const handleSave = () => {
     startTransition(async () => {
@@ -152,19 +199,35 @@ function UserRow({
               <DialogTitle>{t("editUser")}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              {/* User info (read only) */}
+              {/* User info with editable avatar */}
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                {user.image ? (
-                  <div className="h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={user.image} alt="" className="h-full w-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-bold flex-shrink-0">
-                    {(user.nickname || user.name || "?").charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div>
+                <div className="relative flex-shrink-0">
+                  {avatarUrl ? (
+                    <div className="h-14 w-14 rounded-full overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-lg font-bold">
+                      {(user.nickname || user.name || "?").charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="absolute bottom-0 right-0 rounded-full bg-red-600 p-1 text-white hover:bg-red-700 transition-colors"
+                    disabled={uploading}
+                  >
+                    <Camera className="h-3 w-3" />
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium">{user.name || "—"}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <Mail className="h-3 w-3" />
@@ -174,6 +237,16 @@ function UserRow({
                     <ClipboardList className="h-3 w-3" />
                     {user.predictionsCount} {t("predictionsCount")}
                   </p>
+                  {avatarUrl && (
+                    <button
+                      onClick={handleRemoveAvatar}
+                      className="text-xs text-destructive hover:underline flex items-center gap-1 mt-1"
+                      disabled={isPending}
+                    >
+                      <X className="h-3 w-3" />
+                      {t("removeAvatar")}
+                    </button>
+                  )}
                 </div>
               </div>
 

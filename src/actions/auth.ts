@@ -203,7 +203,12 @@ export async function updateNickname(userId: string, nickname: string) {
 
 export async function updateProfileImage(userId: string, imageUrl: string | null) {
   const session = await auth();
-  if (!session?.user?.id || session.user.id !== userId) {
+  if (!session?.user?.id) {
+    return { error: "unauthorized" };
+  }
+
+  const isAdmin = session.user.role === "admin";
+  if (session.user.id !== userId && !isAdmin) {
     return { error: "unauthorized" };
   }
 

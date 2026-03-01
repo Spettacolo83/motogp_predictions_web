@@ -226,7 +226,9 @@
     "userNotFound": "User not found",
     "alreadyVerified": "User is already verified",
     "emailFailed": "Failed to send email",
-    "uploadFailed": "Upload failed"
+    "uploadFailed": "Upload failed",
+    "removeAvatar": "Remove avatar",
+    "avatarRemoved": "Avatar removed"
   },
   "profile": {
     "title": "Your Profile",

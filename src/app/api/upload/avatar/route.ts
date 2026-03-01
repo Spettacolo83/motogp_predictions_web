@@ -18,6 +18,12 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
 
+  // Admin can upload avatar for another user
+  const targetUserId = formData.get("userId") as string | null;
+  const userId = targetUserId && session.user.role === "admin"
+    ? targetUserId
+    : session.user.id;
+
   if (!file) {
     return NextResponse.json({ error: "no file" }, { status: 400 });
   }
@@ -31,7 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
-  const filename = `${session.user.id}-${Date.now()}.${ext}`;
+  const filename = `${userId}-${Date.now()}.${ext}`;
 
   const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "public");
   const uploadDir = path.join(dataDir, "uploads", "avatars");
@@ -47,7 +53,7 @@ export async function POST(request: NextRequest) {
   await db
     .update(users)
     .set({ image: imageUrl })
-    .where(eq(users.id, session.user.id));
+    .where(eq(users.id, userId));
 
   return NextResponse.json({ url: imageUrl });
 }

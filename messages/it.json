@@ -226,7 +226,9 @@
     "userNotFound": "Utente non trovato",
     "alreadyVerified": "L'utente è già verificato",
     "emailFailed": "Invio email fallito",
-    "uploadFailed": "Caricamento fallito"
+    "uploadFailed": "Caricamento fallito",
+    "removeAvatar": "Rimuovi avatar",
+    "avatarRemoved": "Avatar rimosso"
   },
   "profile": {
     "title": "Il Tuo Profilo",

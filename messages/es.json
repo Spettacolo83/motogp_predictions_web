@@ -226,7 +226,9 @@
     "userNotFound": "Usuario no encontrado",
     "alreadyVerified": "El usuario ya esta verificado",
     "emailFailed": "Error al enviar el email",
-    "uploadFailed": "Error al subir el archivo"
+    "uploadFailed": "Error al subir el archivo",
+    "removeAvatar": "Eliminar avatar",
+    "avatarRemoved": "Avatar eliminado"
   },
   "profile": {
     "title": "Tu Perfil",
