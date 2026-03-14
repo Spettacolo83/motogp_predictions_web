@@ -8,6 +8,8 @@ if [ ! -f "/app/data/sqlite.db" ]; then
   echo "Database initialized successfully."
 else
   echo "Database already exists, skipping seed."
+  echo "Running calendar update..."
+  npx tsx src/db/update-calendar.ts
 fi
 
 # Start the application
